@@ -51,25 +51,6 @@ class HomeFragment : Fragment() {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
-
-//        response.enqueue(object: Callback<List<Transaksi>>{
-//            override fun onResponse(p0: Call<List<Transaksi>>, p1: Response<List<Transaksi>>) {
-//                for (i in p1.body()!!){
-//                    transaksiList.add(i.title)
-//                    transaksiList.add(i.amount.toString())
-//                }
-//                val listAdapter = ArrayAdapter(
-//                    requireContext(),
-//                    android.R.layout.simple_list_item_1,
-//                    transaksiList
-//                )
-//                binding.rvTransaksi.adapter =
-//            }
-//
-//            override fun onFailure(p0: Call<List<Transaksi>>, p1: Throwable) {
-//                Toast.makeText(requireContext(), "Koneksi error", Toast.LENGTH_LONG).show()
-//            }
-//        })
     }
 
     override fun onCreateView(
@@ -84,7 +65,8 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // Setup RecyclerView
-        transaksiAdapter = TransaksiAdapter(transaksiList) { transaksi ->
+        transaksiAdapter = TransaksiAdapter(transaksiList, { transaksi ->
+            // Intent untuk detail transaksi
             val intent = Intent(requireContext(), TransactionDetailActivity::class.java).apply {
                 putExtra("title", transaksi.title)
                 putExtra("amount", transaksi.amount.toString())
@@ -92,7 +74,10 @@ class HomeFragment : Fragment() {
                 putExtra("notes", transaksi.notes)
             }
             startActivity(intent)
-        }
+        }, { transaksi ->
+            // Fungsi untuk menghapus transaksi
+            deleteTransaksi(transaksi)
+        })
 
         binding.rvTransaksi.apply {
             adapter = transaksiAdapter
@@ -125,6 +110,27 @@ class HomeFragment : Fragment() {
             }
 
             override fun onFailure(call: Call<List<Transaksi>>, t: Throwable) {
+                Toast.makeText(requireContext(), "Koneksi error: ${t.message}", Toast.LENGTH_LONG).show()
+            }
+        })
+    }
+
+    private fun deleteTransaksi(transaksi: Transaksi) {
+        val client = ApiClient.getInstance()
+        val call = client.deleteTransaksi(transaksi.id) // Ganti dengan ID transaksi yang sesuai
+
+        call.enqueue(object : Callback<Transaksi> {
+            override fun onResponse(call: Call<Transaksi>, response: Response<Transaksi>) {
+                if (response.isSuccessful) {
+                    transaksiList.remove(transaksi)
+                    transaksiAdapter.notifyDataSetChanged()
+                    Toast.makeText(requireContext(), "Transaksi dihapus", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(requireContext(), "Gagal menghapus transaksi", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<Transaksi>, t: Throwable) {
                 Toast.makeText(requireContext(), "Koneksi error: ${t.message}", Toast.LENGTH_LONG).show()
             }
         })

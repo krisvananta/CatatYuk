@@ -9,7 +9,11 @@ import com.example.catatyuk.model.Transaksi
 
 typealias OnClickTransaksi = (Transaksi) -> Unit
 
-class TransaksiAdapter(private val transaksiList: List<Transaksi>, private val onClickTransaksi: OnClickTransaksi) : RecyclerView.Adapter<TransaksiAdapter.ItemTransaksiViewHolder>() {
+class TransaksiAdapter(
+    private val transaksiList: List<Transaksi>,
+    private val onClickTransaksi: (Transaksi) -> Unit,
+    private val onDeleteTransaksi: (Transaksi) -> Unit // Tambahkan parameter untuk delete
+) : RecyclerView.Adapter<TransaksiAdapter.ItemTransaksiViewHolder>() {
 
     inner class ItemTransaksiViewHolder(private val binding: ItemTransaksiBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -27,6 +31,10 @@ class TransaksiAdapter(private val transaksiList: List<Transaksi>, private val o
 
                 itemView.setOnClickListener {
                     onClickTransaksi(data)
+                }
+
+                btnDelete.setOnClickListener {
+                    onDeleteTransaksi(data)
                 }
             }
         }
