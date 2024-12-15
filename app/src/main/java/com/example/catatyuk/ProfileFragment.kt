@@ -1,0 +1,93 @@
+package com.example.catatyuk
+
+import android.content.Intent
+import android.os.Bundle
+import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Toast
+import com.example.catatyuk.databinding.FragmentProfileBinding
+
+// TODO: Rename parameter arguments, choose names that match
+// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+private const val ARG_PARAM1 = "param1"
+private const val ARG_PARAM2 = "param2"
+
+/**
+ * A simple [Fragment] subclass.
+ * Use the [ProfileFragment.newInstance] factory method to
+ * create an instance of this fragment.
+ */
+class ProfileFragment : Fragment() {
+    private lateinit var binding: FragmentProfileBinding
+
+    // TODO: Rename and change types of parameters
+    private var param1: String? = null
+    private var param2: String? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.let {
+            param1 = it.getString(ARG_PARAM1)
+            param2 = it.getString(ARG_PARAM2)
+        }
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = FragmentProfileBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // Set up the logout button
+        binding.btnLogout.setOnClickListener {
+            // Perform logout action
+            logout()
+        }
+
+        // Display user info if needed
+        val username = PrefManager.getInstance(requireContext()).getUsername()
+        binding.tvUsername.text = "Username: $username"  // Show username (if available)
+    }
+
+    private fun logout() {
+        // Clear shared preferences data
+        PrefManager.getInstance(requireContext()).clear()
+
+        // Inform the user about successful logout
+        Toast.makeText(requireContext(), "You have logged out successfully", Toast.LENGTH_SHORT).show()
+
+        // Redirect to LoginActivity
+        val intent = Intent(requireContext(), LoginActivity::class.java)
+        startActivity(intent)
+
+        // Finish the current activity (optional)
+        activity?.finish()
+    }
+
+    companion object {
+        /**
+         * Use this factory method to create a new instance of
+         * this fragment using the provided parameters.
+         *
+         * @param param1 Parameter 1.
+         * @param param2 Parameter 2.
+         * @return A new instance of fragment ProfileFragment.
+         */
+        // TODO: Rename and change types and number of parameters
+        @JvmStatic
+        fun newInstance(param1: String, param2: String) =
+            ProfileFragment().apply {
+                arguments = Bundle().apply {
+                    putString(ARG_PARAM1, param1)
+                    putString(ARG_PARAM2, param2)
+                }
+            }
+    }
+}
